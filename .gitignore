@@ -2,3 +2,4 @@ hardcopy.txt
 venv
 *.swp
 __pycache__
+key.txt

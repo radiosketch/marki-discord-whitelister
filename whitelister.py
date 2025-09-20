@@ -6,6 +6,8 @@ import time
 
 bot = commands.Bot(command_prefix='.', intents=discord.Intents.all())
 
+ADMIN_ROLE_NAMES = ['Admin', 'Minecraft ops']
+
 def send_minecraft_command(command):
     """Send command to minecraft server and return output"""
     subprocess.run(['screen', '-S', 'minecraft', '-X', 'stuff', f'{command}^M'])
@@ -24,32 +26,32 @@ whitelist_group = app_commands.Group(name='whitelist', description='Minecraft wh
 @whitelist_group.command()
 async def add(interaction: discord.Interaction, playername: str):
     """Add player to whitelist"""
-    if not interaction.user.guild_permissions.administrator:
+    if not any(role.name in ADMIN_ROLE_NAMES for role in interaction.user.roles):
         await interaction.response.send_message("Admin permissions required!", ephemeral=True)
         return
     
     output = send_minecraft_command(f'/whitelist add {playername}')
-    await interaction.response.send_message(f"Whitelist add result:\n```{output}```", ephemeral=True)
+    await interaction.response.send_message(f"```{output}```", ephemeral=True)
 
 @whitelist_group.command()
 async def remove(interaction: discord.Interaction, playername: str):
     """Remove player from whitelist"""
-    if not interaction.user.guild_permissions.administrator:
+    if not any(role.name in ADMIN_ROLE_NAMES for role in interaction.user.roles):
         await interaction.response.send_message("Admin permissions required!", ephemeral=True)
         return
     
     output = send_minecraft_command(f'/whitelist remove {playername}')
-    await interaction.response.send_message(f"Whitelist remove result:\n```{output}```", ephemeral=True)
+    await interaction.response.send_message(f"```{output}```", ephemeral=True)
 
 @whitelist_group.command()
 async def list(interaction: discord.Interaction):
     """List whitelisted players"""
-    if not interaction.user.guild_permissions.administrator:
+    if not any(role.name in ADMIN_ROLE_NAMES for role in interaction.user.roles):
         await interaction.response.send_message("Admin permissions required!", ephemeral=True)
         return
     
     output = send_minecraft_command('/whitelist list')
-    await interaction.response.send_message(f"Whitelist:\n```{output}```", ephemeral=True)
+    await interaction.response.send_message(f"```{output}```", ephemeral=True)
 
 @bot.event
 async def on_ready():
@@ -57,4 +59,7 @@ async def on_ready():
     await bot.tree.sync()
     print(f'{bot.user} has connected to Discord!')
 
-# bot.run('YOUR_BOT_TOKEN')
+with open('key.txt') as f:
+    key = f.read()
+
+bot.run(key)
