@@ -9,12 +9,13 @@ bot = commands.Bot(command_prefix='.', intents=discord.Intents.all())
 def send_minecraft_command(command):
     """Send command to minecraft server and return output"""
     subprocess.run(['screen', '-S', 'minecraft', '-X', 'stuff', f'{command}^M'])
-    time.sleep(1)
-    subprocess.run(['screen', '-S', 'minecraft', '-X', 'hardcopy', '~/DiscordBots/hardcopy.txt'])
+    time.sleep(0.5)
+    subprocess.run(['screen', '-S', 'minecraft', '-X', 'hardcopy', '/home/marcus/DiscordBots/hardcopy.txt'])
+    time.sleep(0.5)
     
     try:
-        with open('~/DiscordBots/hardcopy.txt', 'r') as f:
-            return f.read().strip()
+        with open('/home/marcus/DiscordBots/hardcopy.txt', 'r') as f:
+            return f.read().strip().split('\n')[-2]
     except FileNotFoundError:
         return "No output captured"
 
